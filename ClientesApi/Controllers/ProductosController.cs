@@ -1,5 +1,4 @@
 using ClientesApi.Data;
-using ClientesApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProductosApi.Models;
@@ -11,16 +10,19 @@ namespace ProductosApi.Controllers
     public class ProductosController : ControllerBase
     {
         private readonly AppDbContext _context;
+        //Constructor
         public ProductosController(AppDbContext context)
         {
             _context = context;
         }
+        //GET: api/Productos
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Producto>>> Listar()
         {
             var productos = await _context.Productos.AsNoTracking().ToListAsync();
             return Ok(productos);
         }
+        //GET: api/Productos/{id}
         [HttpGet("{id:int}")]
         public async Task<ActionResult<Producto>> ObtenerPorId(int id)
         {
@@ -31,6 +33,7 @@ namespace ProductosApi.Controllers
             }
             return Ok(producto);
         }
+        //POST: api/Productos
         [HttpPost]
         public async Task<ActionResult<Producto>> Registrar([FromBody] Producto producto)
         {
@@ -44,6 +47,7 @@ namespace ProductosApi.Controllers
             return CreatedAtAction(nameof(ObtenerPorId), new { id = producto.Id }, producto);
         }
 
+        //PUT: api/Productos/{id}
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Actualizar(int id, [FromBody] Producto producto)
         {
@@ -73,7 +77,7 @@ namespace ProductosApi.Controllers
 
             return NoContent();
         }
-
+        //DELETE: api/Productos/{id}
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Eliminar(int id)
         {
