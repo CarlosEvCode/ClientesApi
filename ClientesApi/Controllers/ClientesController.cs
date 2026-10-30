@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClientesApi.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ClientesController : ControllerBase
@@ -25,10 +25,30 @@ namespace ClientesApi.Controllers
         //IEnumerable : lista de objetos (colección <Tipo>)
         //ActionResult : respuesta HTTP (200, 404, 500, etc)
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Cliente>>> Listar()
+        public async Task<ActionResult<IEnumerable<Cliente>>> Listar([FromQuery] string? buscar)
         {
-            var clientes = await _context.Clientes.AsNoTracking().ToListAsync();
-            return Ok(clientes);
+            //Algoritmo básico para listar todo sin filtro
+            //var clientes = await _context.Clientes.AsNoTracking().ToListAsync();
+            //return Ok(clientes);
+
+            //Algoritmo que permite listar todo o aplicar un filtro de búsqueda (query string)
+            var consulta = _context.Clientes.AsQueryable(); //AsQueryable permite construir consultas dinámicas
+
+            //Si la variable buscar no está vacía (apellidos, nombres, dni)
+            if (!string.IsNullOrWhiteSpace(buscar))
+            {
+                var texto = buscar.Trim().ToLower(); //eliminar espacios y pasar a minúscula
+                consulta = consulta.Where(c =>
+                    c.Nombres.Contains(texto) ||
+                    c.Apellidos.Contains(texto) ||
+                    c.Dni.Contains(texto));
+            }
+
+            var lista = await consulta
+                .OrderBy(c => c.Apellidos)
+                .ThenBy(c => c.Nombres)
+                .Take(200).ToListAsync();
+            return Ok(lista);
         }
 
         //GET: api/Clientes/{id} -> retornar un cliente por id
@@ -109,7 +129,7 @@ namespace ClientesApi.Controllers
         }
 
         //DELETE: api/Clientes/{id} -> eliminar un cliente por id
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Eliminar(int id)
         {
