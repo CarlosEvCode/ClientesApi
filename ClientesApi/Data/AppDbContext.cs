@@ -15,6 +15,7 @@ public class AppDbContext : DbContext
     //ORM tendrá acceso al modelo cliente
     public DbSet<Cliente> Clientes { get; set; } //Clientes => tabla clientes
     public DbSet<Producto> Productos { get; set; } //Productos => tabla productos
+    public DbSet<Proveedor> Proveedores { get; set; } //Proveedores => tabla proveedores
     public DbSet<Usuario> Usuarios { get; set; } //Usuarios => tabla usuarios
 
 }
